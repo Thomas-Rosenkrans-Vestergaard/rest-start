@@ -41,7 +41,8 @@ public class JpaReadRepositoryTester<
                 createCountTest(),
                 createGetByIdTest(),
                 createGetByIdsTest(),
-                createExistsTest()
+                createExistsTest(),
+                createExistsSetTest()
         ));
 
         tests.addAll(createQueryTests());
@@ -154,7 +155,7 @@ public class JpaReadRepositoryTester<
 
     private DynamicTest createExistsTest()
     {
-        return DynamicTest.dynamicTest("exists", () -> {
+        return DynamicTest.dynamicTest("exists(K)", () -> {
             try (I instance = constructor.get()) {
                 instance.begin();
                 TreeMap<K, E> data = dataProducer.apply(instance);
@@ -163,6 +164,23 @@ public class JpaReadRepositoryTester<
                 }
 
                 assertFalse(instance.exists(unknownKey));
+            }
+        });
+    }
+
+    private DynamicTest createExistsSetTest()
+    {
+        return DynamicTest.dynamicTest("exists(Set<K>)", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                TreeMap<K, E> data = dataProducer.apply(instance);
+                assertTrue(instance.exists(new HashSet<>()));
+                assertTrue(instance.exists(data.keySet()));
+                assertFalse(instance.exists(new HashSet(Arrays.asList(unknownKey))));
+
+                Set<K> dataKeys = new HashSet<>(data.keySet());
+                dataKeys.add(unknownKey);
+                assertFalse(instance.exists(dataKeys));
             }
         });
     }

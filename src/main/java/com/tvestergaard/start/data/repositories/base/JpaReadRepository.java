@@ -213,7 +213,7 @@ public class JpaReadRepository<E extends RepositoryEntity<K>, K extends Comparab
                 .setParameter("ids", ids)
                 .getSingleResult();
 
-        return count > 0;
+        return count == ids.size();
     }
 
     /**
