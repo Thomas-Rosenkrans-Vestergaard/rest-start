@@ -19,18 +19,15 @@ public class JpaReadRepositoryTester<
     protected final Supplier<I>                constructor;
     protected final Function<I, TreeMap<K, E>> dataProducer;
     protected final K                          unknownKey;
-    protected final long                       initialDataSize;
 
     public JpaReadRepositoryTester(
             Supplier<I> constructor,
             Function<I, TreeMap<K, E>> dataProducer,
-            K unknownKey,
-            long initialDataSize)
+            K unknownKey)
     {
         this.constructor = constructor;
         this.dataProducer = dataProducer;
         this.unknownKey = unknownKey;
-        this.initialDataSize = initialDataSize;
     }
 
     public Collection<DynamicTest> getDynamicTests()
@@ -439,7 +436,8 @@ public class JpaReadRepositoryTester<
 
             try (I instance = constructor.get()) {
                 instance.begin();
-                assertEquals(this.initialDataSize, instance.query().count());
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(data.size(), instance.query().count());
             }
         });
     }
@@ -458,7 +456,8 @@ public class JpaReadRepositoryTester<
 
             try (I instance = constructor.get()) {
                 instance.begin();
-                if (this.initialDataSize > 0)
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                if (data.size() > 0)
                     assertTrue(instance.query().exists());
                 else
                     assertFalse(instance.query().exists());
