@@ -18,7 +18,7 @@ import java.util.Set;
  * @param <E> The type of the entity managed by the repository.
  * @param <K> The type of the key of the entities managed by the repository.
  */
-public class JpaReadRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
+public class JpaReadRepository<K extends Comparable<K>, E extends RepositoryEntity<K>>
         extends AbstractJpaRepository implements ReadRepository<K, E>
 {
 

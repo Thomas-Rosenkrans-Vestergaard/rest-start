@@ -17,7 +17,7 @@ import java.util.Map;
  * @param <K> The type of the key of the entities managed by the repository.
  */
 public abstract class JpaCrudRepository<K extends Comparable<K>, E extends RepositoryEntity<K>>
-        extends JpaReadRepository<E, K>
+        extends JpaReadRepository<K, E>
         implements CrudRepository<K, E>
 {
 

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JpaReadRepositoryTester<
         E extends RepositoryEntity<K>,
         K extends Comparable<K>,
-        I extends JpaReadRepository<E, K>>
+        I extends JpaReadRepository<K, E>>
 {
 
     protected final Supplier<I>                constructor;
