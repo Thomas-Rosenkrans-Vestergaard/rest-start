@@ -26,6 +26,7 @@ public class JpaCrudRepositoryTester<
     public Collection<DynamicTest> getDynamicTests()
     {
         Collection<DynamicTest> tests = super.getDynamicTests();
+        tests.add(createPersistTest());
         tests.add(createUpdateTest());
         tests.add(createDeleteTest());
         tests.add(createDeleteEntityTest());
@@ -33,6 +34,13 @@ public class JpaCrudRepositoryTester<
         tests.add(createDeleteListOfEntitiesTest());
 
         return tests;
+    }
+
+    private DynamicTest createPersistTest()
+    {
+        return DynamicTest.dynamicTest("persist", () -> {
+
+        });
     }
 
     private DynamicTest createUpdateTest()

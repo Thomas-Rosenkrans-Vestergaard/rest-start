@@ -17,6 +17,14 @@ public interface CrudRepository<K extends Comparable<K>, E extends RepositoryEnt
 {
 
     /**
+     * Persists the provided entity,
+     *
+     * @param entity The entity to persist.
+     * @return The persisted entity.
+     */
+    E persist(E entity);
+
+    /**
      * Forces the entity to update.
      *
      * @param entity The entity to update.

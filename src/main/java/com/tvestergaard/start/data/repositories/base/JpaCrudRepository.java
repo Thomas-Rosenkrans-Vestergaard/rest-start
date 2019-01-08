@@ -62,6 +62,12 @@ public abstract class JpaCrudRepository<K extends Comparable<K>, E extends Repos
         super(transaction, kClass, kAttribute, eClass);
     }
 
+    @Override public E persist(E entity)
+    {
+        getEntityManager().persist(entity);
+        return entity;
+    }
+
     /**
      * Forces the entity to update.
      *
