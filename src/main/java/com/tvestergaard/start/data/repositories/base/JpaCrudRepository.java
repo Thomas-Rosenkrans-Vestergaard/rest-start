@@ -103,11 +103,15 @@ public abstract class JpaCrudRepository<K extends Comparable<K>, E extends Repos
      * Deletes the provided entity.
      *
      * @param entity The entity to delete.
-     * @return The deleted entity.
+     * @return The deleted entity. Returns {@code null} when the provided entity does not exist, or the provided
+     * {@code entity} is {@code null}.
      */
     @Override
     public E delete(E entity)
     {
+        if (entity == null)
+            return null;
+
         return delete(entity.getId());
     }
 
