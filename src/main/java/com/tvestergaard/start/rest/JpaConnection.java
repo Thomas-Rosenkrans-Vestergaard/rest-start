@@ -36,7 +36,7 @@ public class JpaConnection
         HashMap<String, String> options     = new HashMap<>();
         InputStream             inputStream = JpaConnection.class.getResourceAsStream(file);
         if (inputStream == null)
-            throw new IllegalStateException(String.format("No %s configuration file in resources.", file));
+            return new HashMap<>(0);
         Scanner scanner    = new Scanner(inputStream);
         int     lineNumber = 1;
         while (scanner.hasNextLine()) {
