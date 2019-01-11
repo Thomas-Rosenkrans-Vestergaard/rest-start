@@ -47,9 +47,10 @@ public class ResourceCreator<K extends Comparable<K>, E extends RepositoryEntity
      *
      * @param data The data from which the entity is created.
      * @return The persisted entity.
-     * @throws ResourceValidationException When the entity cannot be created.
+     * @throws MalformedResourceDataException When the entity cannot be created from the resource data.
+     * @throws ResourceValidationException    When the entity cannot be validated.
      */
-    public E persist(ResourceData<E> data) throws ResourceValidationException
+    public E persist(ResourceData<E> data) throws MalformedResourceDataException, ResourceValidationException
     {
         E entity = data.toEntity();
         if (validatorFactory != null) {
