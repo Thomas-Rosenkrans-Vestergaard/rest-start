@@ -9,7 +9,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class ResourceRetriever<K extends Comparable<K>, E extends RepositoryEntity<K>>
+/**
+ * Retrieves resources from some repository.
+ *
+ * @param <K> The type of the keys of the resources.
+ * @param <R> The resource type.
+ */
+public class ResourceRetriever<K extends Comparable<K>, R extends RepositoryEntity<K>>
 {
 
     /**
@@ -20,7 +26,7 @@ public class ResourceRetriever<K extends Comparable<K>, E extends RepositoryEnti
     /**
      * The factory that produces repository instances.
      */
-    private final Supplier<ReadRepository<K, E>> repositoryFactory;
+    private final Supplier<ReadRepository<K, R>> repositoryFactory;
 
     /**
      * Creates a new {@link ResourceRetriever}.
@@ -28,7 +34,7 @@ public class ResourceRetriever<K extends Comparable<K>, E extends RepositoryEnti
      * @param kClass            The class of the key type.
      * @param repositoryFactory The factory that produces repository instances.
      */
-    public ResourceRetriever(Class<K> kClass, Supplier<ReadRepository<K, E>> repositoryFactory)
+    public ResourceRetriever(Class<K> kClass, Supplier<ReadRepository<K, R>> repositoryFactory)
     {
         this.kClass = kClass;
         this.repositoryFactory = repositoryFactory;
@@ -39,9 +45,9 @@ public class ResourceRetriever<K extends Comparable<K>, E extends RepositoryEnti
      *
      * @return The list of the entities.
      */
-    public List<E> getAll()
+    public List<R> getAll()
     {
-        try (ReadRepository<K, E> repository = repositoryFactory.get()) {
+        try (ReadRepository<K, R> repository = repositoryFactory.get()) {
             return repository.getAll();
         }
     }
@@ -53,7 +59,7 @@ public class ResourceRetriever<K extends Comparable<K>, E extends RepositoryEnti
      */
     public long count()
     {
-        try (ReadRepository<K, E> repository = repositoryFactory.get()) {
+        try (ReadRepository<K, R> repository = repositoryFactory.get()) {
             return repository.count();
         }
     }
@@ -65,10 +71,10 @@ public class ResourceRetriever<K extends Comparable<K>, E extends RepositoryEnti
      * @return The resource with the provided id.
      * @throws ResourceNotFoundException When no such resource exists.
      */
-    public E get(K id) throws ResourceNotFoundException
+    public R get(K id) throws ResourceNotFoundException
     {
-        try (ReadRepository<K, E> repository = repositoryFactory.get()) {
-            E resource = repository.get(id);
+        try (ReadRepository<K, R> repository = repositoryFactory.get()) {
+            R resource = repository.get(id);
             if (resource == null)
                 throw new ResourceNotFoundException(kClass, id);
 
@@ -83,9 +89,9 @@ public class ResourceRetriever<K extends Comparable<K>, E extends RepositoryEnti
      * @param ids The ids of the resources to return.
      * @return The resources with the provided ids.
      */
-    public Map<K, E> get(Set<K> ids)
+    public Map<K, R> get(Set<K> ids)
     {
-        try (ReadRepository<K, E> repository = repositoryFactory.get()) {
+        try (ReadRepository<K, R> repository = repositoryFactory.get()) {
             return repository.get(ids);
         }
     }
@@ -94,18 +100,24 @@ public class ResourceRetriever<K extends Comparable<K>, E extends RepositoryEnti
      * Checks if the resource with the provided id exists.
      *
      * @param id The id of the resource to check for.
-     * @return {@c}
+     * @return {@code true} when the resource exists, {@code false} when it does not.
      */
     public boolean exists(K id)
     {
-        try (ReadRepository<K, E> repository = repositoryFactory.get()) {
+        try (ReadRepository<K, R> repository = repositoryFactory.get()) {
             return repository.exists(id);
         }
     }
 
+    /**
+     * Checks if all the resources with the provided ids exists.
+     *
+     * @param ids The resource ids to check for.
+     * @return {@code true} when all the resources with the provided ids exists, {@code false} otherwise.
+     */
     public boolean exists(Set<K> ids)
     {
-        try (ReadRepository<K, E> repository = repositoryFactory.get()) {
+        try (ReadRepository<K, R> repository = repositoryFactory.get()) {
             return repository.exists(ids);
         }
     }

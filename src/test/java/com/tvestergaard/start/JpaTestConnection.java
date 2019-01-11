@@ -3,15 +3,24 @@ package com.tvestergaard.start;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-public class JpaTestConnection
+public abstract class JpaTestConnection
 {
-    private static EntityManagerFactory emf;
+    private static EntityManagerFactory _emf;
 
     public static EntityManagerFactory create()
     {
-        if (emf == null)
-            emf = Persistence.createEntityManagerFactory("rest-api-test-pu");
+        if (_emf == null)
+            _emf = Persistence.createEntityManagerFactory("rest-api-test-pu");
 
-        return emf;
+        return _emf;
     }
+
+    protected final EntityManagerFactory emf;
+
+    public JpaTestConnection()
+    {
+        this.emf = Persistence.createEntityManagerFactory("rest-api-test-pu");
+    }
+
+    public abstract void reset();
 }

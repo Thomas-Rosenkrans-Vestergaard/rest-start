@@ -7,7 +7,13 @@ import com.tvestergaard.start.logic.ResourceNotFoundException;
 import java.util.*;
 import java.util.function.Supplier;
 
-public class ResourceDeleter<K extends Comparable<K>, E extends RepositoryEntity<K>>
+/**
+ * Deletes resources from some repository.
+ *
+ * @param <K> The type of the keys of the resources.
+ * @param <R> The resource type.
+ */
+public class ResourceDeleter<K extends Comparable<K>, R extends RepositoryEntity<K>>
 {
 
     /**
@@ -18,12 +24,12 @@ public class ResourceDeleter<K extends Comparable<K>, E extends RepositoryEntity
     /**
      * The factory that creates the repository to create.
      */
-    private final Supplier<CrudRepository<K, E>> repositoryFactory;
+    private final Supplier<CrudRepository<K, R>> repositoryFactory;
 
     /**
-     * The factory that creates the validator that is used to validate the entity.
+     * The factory that creates the validator that is used to validate the resource.
      */
-    private final ValidatorFactory<E> validatorFactory;
+    private final ValidatorFactory<R> validatorFactory;
 
     /**
      * Creates a new {@link ResourceCreator}.
@@ -31,7 +37,7 @@ public class ResourceDeleter<K extends Comparable<K>, E extends RepositoryEntity
      * @param kClass            The class of the key type.
      * @param repositoryFactory The factory that creates the repository to create.
      */
-    public ResourceDeleter(Class<K> kClass, Supplier<CrudRepository<K, E>> repositoryFactory)
+    public ResourceDeleter(Class<K> kClass, Supplier<CrudRepository<K, R>> repositoryFactory)
     {
         this(kClass, repositoryFactory, null);
     }
@@ -41,9 +47,9 @@ public class ResourceDeleter<K extends Comparable<K>, E extends RepositoryEntity
      *
      * @param kClass            The class of the key type.
      * @param repositoryFactory The factory that creates the repository to create.
-     * @param validatorFactory  The factory that creates the validator that is used to validate the entity.
+     * @param validatorFactory  The factory that creates the validator that is used to validate the resource.
      */
-    public ResourceDeleter(Class<K> kClass, Supplier<CrudRepository<K, E>> repositoryFactory, ValidatorFactory<E> validatorFactory)
+    public ResourceDeleter(Class<K> kClass, Supplier<CrudRepository<K, R>> repositoryFactory, ValidatorFactory<R> validatorFactory)
     {
         this.kClass = kClass;
         this.repositoryFactory = repositoryFactory;
@@ -51,17 +57,17 @@ public class ResourceDeleter<K extends Comparable<K>, E extends RepositoryEntity
     }
 
     /**
-     * Deletes the entity with the provided key.
+     * Deletes the resource with the provided key.
      *
-     * @param id The id of the entity to delete.
-     * @return The deleted entity.
-     * @throws ResourceNotFoundException When an entity with the provided id does not exist.
+     * @param id The id of the resource to delete.
+     * @return The deleted resource.
+     * @throws ResourceNotFoundException When an resource with the provided id does not exist.
      */
-    public E delete(K id) throws ResourceNotFoundException
+    public R delete(K id) throws ResourceNotFoundException
     {
-        try (CrudRepository<K, E> repository = repositoryFactory.get()) {
+        try (CrudRepository<K, R> repository = repositoryFactory.get()) {
             repository.begin();
-            E deleted = repository.delete(id);
+            R deleted = repository.delete(id);
             if (deleted == null)
                 throw new ResourceNotFoundException(kClass, id);
             repository.commit();
@@ -70,23 +76,23 @@ public class ResourceDeleter<K extends Comparable<K>, E extends RepositoryEntity
     }
 
     /**
-     * Deletes the provided entity from persistent storage.
+     * Deletes the provided resource from persistent storage.
      *
-     * @param entity The entity to delete from persistent storage.
-     * @return The deleted entity.
-     * @throws ResourceNotFoundException When the provided entity does not exist in persistent storage, or the
-     *                                   provided {@code entity} equals {@code null}.
+     * @param resource The resource to delete from persistent storage.
+     * @return The deleted resource.
+     * @throws ResourceNotFoundException When the provided resource does not exist in persistent storage, or the
+     *                                   provided {@code resource} equals {@code null}.
      */
-    public E delete(E entity) throws ResourceNotFoundException
+    public R delete(R resource) throws ResourceNotFoundException
     {
-        if (entity == null)
+        if (resource == null)
             throw new ResourceNotFoundException(kClass, null);
 
-        try (CrudRepository<K, E> repository = repositoryFactory.get()) {
+        try (CrudRepository<K, R> repository = repositoryFactory.get()) {
             repository.begin();
-            E deleted = repository.delete(entity);
+            R deleted = repository.delete(resource);
             if (deleted == null)
-                throw new ResourceNotFoundException(kClass, entity.getId());
+                throw new ResourceNotFoundException(kClass, resource.getId());
             repository.commit();
             return deleted;
         }
@@ -99,33 +105,33 @@ public class ResourceDeleter<K extends Comparable<K>, E extends RepositoryEntity
      * @return A map containing the deleted entities mapped to their keys. Any non-existing keys
      * are not returned in the map.
      */
-    public Map<K, E> delete(Collection<K> keys)
+    public Map<K, R> delete(Collection<K> keys)
     {
         if (keys == null || keys.isEmpty())
             return new HashMap<>(0);
 
-        try (CrudRepository<K, E> repository = repositoryFactory.get()) {
+        try (CrudRepository<K, R> repository = repositoryFactory.get()) {
             repository.begin();
-            Map<K, E> deleted = repository.delete(keys);
+            Map<K, R> deleted = repository.delete(keys);
             repository.commit();
             return deleted;
         }
     }
 
     /**
-     * Deletes the provided entity from persistent storage.
+     * Deletes the provided resource from persistent storage.
      *
      * @param entities The entities to delete from persistence storage.
      * @return The list of the entities to delete.
      */
-    public List<E> delete(List<E> entities)
+    public List<R> delete(List<R> entities)
     {
         if (entities == null || entities.isEmpty())
             return new ArrayList<>(0);
 
-        try (CrudRepository<K, E> repository = repositoryFactory.get()) {
+        try (CrudRepository<K, R> repository = repositoryFactory.get()) {
             repository.begin();
-            List<E> deleted = repository.delete(entities);
+            List<R> deleted = repository.delete(entities);
             repository.commit();
             return deleted;
         }

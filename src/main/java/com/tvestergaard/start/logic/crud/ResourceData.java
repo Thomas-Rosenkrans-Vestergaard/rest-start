@@ -1,13 +1,14 @@
 package com.tvestergaard.start.logic.crud;
 
-public interface ResourceData<E>
+@FunctionalInterface
+public interface ResourceData<R>
 {
 
     /**
-     * Converts the data to an entity.
+     * Converts the data to an resource.
      *
-     * @return The resulting entity.
+     * @return The resulting resource.
      * @throws MalformedResourceDataException When the data cannot be converted into a resource.
      */
-    E toEntity() throws MalformedResourceDataException;
+    R toResource() throws MalformedResourceDataException;
 }
