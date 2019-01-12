@@ -26,7 +26,7 @@ public class ResourceRetriever<K extends Comparable<K>, R extends RepositoryEnti
     /**
      * The factory that produces repository instances.
      */
-    private final Supplier<ReadRepository<K, R>> repositoryFactory;
+    private final Supplier<? extends ReadRepository<K, R>> repositoryFactory;
 
     /**
      * Creates a new {@link ResourceRetriever}.
@@ -34,7 +34,7 @@ public class ResourceRetriever<K extends Comparable<K>, R extends RepositoryEnti
      * @param kClass            The class of the key type.
      * @param repositoryFactory The factory that produces repository instances.
      */
-    public ResourceRetriever(Class<K> kClass, Supplier<ReadRepository<K, R>> repositoryFactory)
+    public ResourceRetriever(Class<K> kClass, Supplier<? extends ReadRepository<K, R>> repositoryFactory)
     {
         this.kClass = kClass;
         this.repositoryFactory = repositoryFactory;

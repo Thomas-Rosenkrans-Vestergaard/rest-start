@@ -27,11 +27,6 @@ public class ResourceDeleter<K extends Comparable<K>, R extends RepositoryEntity
     private final Supplier<CrudRepository<K, R>> repositoryFactory;
 
     /**
-     * The factory that creates the validator that is used to validate the resource.
-     */
-    private final ValidatorFactory<R> validatorFactory;
-
-    /**
      * Creates a new {@link ResourceCreator}.
      *
      * @param kClass            The class of the key type.
@@ -39,21 +34,8 @@ public class ResourceDeleter<K extends Comparable<K>, R extends RepositoryEntity
      */
     public ResourceDeleter(Class<K> kClass, Supplier<CrudRepository<K, R>> repositoryFactory)
     {
-        this(kClass, repositoryFactory, null);
-    }
-
-    /**
-     * Creates a new {@link ResourceCreator}.
-     *
-     * @param kClass            The class of the key type.
-     * @param repositoryFactory The factory that creates the repository to create.
-     * @param validatorFactory  The factory that creates the validator that is used to validate the resource.
-     */
-    public ResourceDeleter(Class<K> kClass, Supplier<CrudRepository<K, R>> repositoryFactory, ValidatorFactory<R> validatorFactory)
-    {
         this.kClass = kClass;
         this.repositoryFactory = repositoryFactory;
-        this.validatorFactory = validatorFactory;
     }
 
     /**
@@ -85,8 +67,8 @@ public class ResourceDeleter<K extends Comparable<K>, R extends RepositoryEntity
      */
     public R delete(R resource) throws ResourceNotFoundException
     {
-        if (resource == null)
-            throw new ResourceNotFoundException(kClass, null);
+        if (resource == null || resource.getId() == null)
+            throw new ResourceNotFoundException(kClass, "null");
 
         try (CrudRepository<K, R> repository = repositoryFactory.get()) {
             repository.begin();

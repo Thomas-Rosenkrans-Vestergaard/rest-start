@@ -144,6 +144,9 @@ public class JpaReadRepository<K extends Comparable<K>, E extends RepositoryEnti
     @Override
     public E get(K id)
     {
+        if (id == null)
+            return null;
+
         return getEntityManager().find(eClass, id);
     }
 

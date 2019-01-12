@@ -6,7 +6,10 @@ import com.tvestergaard.start.logic.ResourceNotFoundException;
 import com.tvestergaard.start.logic.crud.validation.ResourceValidationException;
 import com.tvestergaard.start.logic.crud.validation.ResourceValidator;
 
+import javax.persistence.Id;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -55,10 +58,10 @@ public class ResourceUpdater<K extends Comparable<K>, R extends RepositoryEntity
     }
 
     /**
-     * Updates the resource with the provided data.
+     * Updates the resource with the provided {@code key}, to match the provided {@code data}.
      *
      * @param key  The key of the resource to update.
-     * @param data The updated data.
+     * @param data The data to update the resource to.
      * @return The updated resource.
      * @throws ResourceNotFoundException      When the resource with the provided key does not exist.
      * @throws MalformedResourceDataException When the resource cannot be created from the resource data.
@@ -73,7 +76,7 @@ public class ResourceUpdater<K extends Comparable<K>, R extends RepositoryEntity
         try (CrudRepository<K, R> repository = repositoryFactory.get()) {
             R found = repository.get(key);
             if (found == null)
-                throw new ResourceNotFoundException(kClass, key);
+                throw new ResourceNotFoundException(kClass, key == null ? "null" : key);
 
             R sent   = data.toResource();
             R merged = merge(sent, found);
@@ -91,6 +94,70 @@ public class ResourceUpdater<K extends Comparable<K>, R extends RepositoryEntity
     }
 
     /**
+     * Updates the provided {@code resource} to match the provided {@code data}.
+     *
+     * @param resource The resource to update.
+     * @param data     The data to update the resource to.
+     * @return The updated resource.
+     * @throws ResourceNotFoundException      When the resource with the provided key does not exist.
+     * @throws MalformedResourceDataException When the resource cannot be created from the resource data.
+     * @throws ResourceValidationException    When the resource cannot be validated.
+     */
+    public R update(R resource, ResourceData<R> data)
+            throws
+            ResourceNotFoundException,
+            MalformedResourceDataException,
+            ResourceValidationException
+    {
+        if (resource == null)
+            return update((K) null, data);
+
+        return update(resource.getId(), data);
+    }
+
+    /**
+     * Updates all the resource with the provided ids, to match the provided resource data.
+     *
+     * @param updateData The new data mapped to the resource key to update.
+     * @return The updated resources mapped to their id.
+     * @throws ResourceNotFoundException      When the resource with the provided key does not exist.
+     * @throws MalformedResourceDataException When the resource cannot be created from the resource data.
+     * @throws ResourceValidationException    When the resource cannot be validated.
+     */
+    public Map<K, R> update(Map<K, ResourceData<R>> updateData)
+            throws
+            ResourceNotFoundException,
+            MalformedResourceDataException,
+            ResourceValidationException
+    {
+
+        Map<K, R> results = new HashMap<>(updateData.size());
+        try (CrudRepository<K, R> repository = repositoryFactory.get()) {
+
+            repository.begin();
+            for (Map.Entry<K, ResourceData<R>> entry : updateData.entrySet()) {
+                K key   = entry.getKey();
+                R found = repository.get(key);
+                if (found == null)
+                    throw new ResourceNotFoundException(kClass, key);
+
+                R sent   = entry.getValue().toResource();
+                R merged = merge(sent, found);
+                if (validatorFactory != null) {
+                    ResourceValidator<R> validator = validatorFactory.create(merged);
+                    validator.throwResourceValidationException();
+                }
+
+                results.put(key, repository.update(merged));
+            }
+
+            repository.commit();
+        }
+
+        return results;
+    }
+
+    /**
      * Transfers all non-null values in the provided {@code source} resource to the provided {@code destination}
      * resource.
      *
@@ -102,11 +169,18 @@ public class ResourceUpdater<K extends Comparable<K>, R extends RepositoryEntity
     {
         try {
             for (Field field : destination.getClass().getDeclaredFields()) {
+
+                if (field.getAnnotation(Id.class) != null)
+                    continue;
+
                 boolean accessible = field.isAccessible();
-                Object  value      = field.get(source);
-                field.setAccessible(accessible);
+                field.setAccessible(true);
+
+                Object value = field.get(source);
                 if (value != null)
                     field.set(destination, value);
+
+                field.setAccessible(accessible);
             }
 
             return destination;

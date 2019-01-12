@@ -91,12 +91,12 @@ public class ResourceCreator<K extends Comparable<K>, R extends RepositoryEntity
 
         List<R> resources = new ArrayList<>(all.size());
 
-        if (validatorFactory != null) {
-            for (ResourceData<R> data : all) {
-                R                    resource  = data.toResource();
+        for (ResourceData<R> data : all) {
+            R resource = data.toResource();
+            resources.add(resource);
+            if (validatorFactory != null) {
                 ResourceValidator<R> validator = validatorFactory.create(resource);
                 validator.throwResourceValidationException();
-                resources.add(resource);
             }
         }
 

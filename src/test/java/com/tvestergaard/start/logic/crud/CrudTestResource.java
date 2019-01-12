@@ -2,14 +2,12 @@ package com.tvestergaard.start.logic.crud;
 
 import com.tvestergaard.start.data.repositories.base.RepositoryEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class Resource implements RepositoryEntity<Integer>
+@Table(name = "testResource")
+public class CrudTestResource implements RepositoryEntity<Integer>
 {
 
     @Id
@@ -18,7 +16,12 @@ public class Resource implements RepositoryEntity<Integer>
     private String  name;
     private String  email;
 
-    public Resource(String name, String email)
+    public CrudTestResource()
+    {
+
+    }
+
+    public CrudTestResource(String name, String email)
     {
         this.name = name;
         this.email = email;
@@ -29,7 +32,7 @@ public class Resource implements RepositoryEntity<Integer>
         return this.id;
     }
 
-    public Resource setId(Integer id)
+    public CrudTestResource setId(Integer id)
     {
         this.id = id;
         return this;
@@ -40,7 +43,7 @@ public class Resource implements RepositoryEntity<Integer>
         return this.name;
     }
 
-    public Resource setName(String name)
+    public CrudTestResource setName(String name)
     {
         this.name = name;
         return this;
@@ -51,7 +54,7 @@ public class Resource implements RepositoryEntity<Integer>
         return this.email;
     }
 
-    public Resource setEmail(String email)
+    public CrudTestResource setEmail(String email)
     {
         this.email = email;
         return this;
@@ -61,7 +64,7 @@ public class Resource implements RepositoryEntity<Integer>
     {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Resource resource = (Resource) o;
+        CrudTestResource resource = (CrudTestResource) o;
         return Objects.equals(id, resource.id) &&
                Objects.equals(name, resource.name) &&
                Objects.equals(email, resource.email);
