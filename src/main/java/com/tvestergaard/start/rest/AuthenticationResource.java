@@ -1,9 +1,11 @@
 package com.tvestergaard.start.rest;
 
 import com.google.gson.Gson;
+import com.tvestergaard.start.data.repositories.JpaUserRepository;
 import com.tvestergaard.start.logic.AuthenticationFacade;
 import com.tvestergaard.start.logic.SpecializedGson;
 import com.tvestergaard.start.logic.authentication.AuthenticationContext;
+import com.tvestergaard.start.logic.authentication.jwt.BasicJwtSecret;
 import com.tvestergaard.start.rest.dto.AuthenticationDTO;
 
 import javax.ws.rs.Consumes;
@@ -18,7 +20,12 @@ public class AuthenticationResource
 {
 
     private static Gson                 gson                 = SpecializedGson.create();
-    private static AuthenticationFacade authenticationFacade = null;
+    private static byte[]               secret               = new byte[]{1, 2, 3, 4,};
+    private static AuthenticationFacade authenticationFacade = new AuthenticationFacade(
+            new BasicJwtSecret(secret),
+            () -> new JpaUserRepository(JpaConnection.create())
+    );
+
 
     @POST
     @Path("user")
